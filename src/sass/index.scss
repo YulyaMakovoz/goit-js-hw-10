@@ -7,9 +7,15 @@ body {
         Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #fafafa;
+    // background-color: #fafafa;
     color: #212121;
     line-height: 1.5;
+    background-image:linear-gradient(rgba(197, 197, 206, 0.4), rgba(178, 179, 193, 0.4)), url(/src/images/2152301041_w640_h640_karta-mira-anglijskaya.webp);
+    background-repeat:no-repeat;
+    height: 100vh;
+    background-size: cover;
+    
+    
 }
 
 #search-box {
@@ -17,4 +23,40 @@ body {
     padding: 8px;
     max-width: 320px;
     margin-bottom: 16px;
+}
+
+li{
+    list-style: none;
+    display: flex;
+    
+    align-items: center;
+}
+
+.item-list{
+    gap: 10px;
+    font-size: 14px;
+    
+}
+h1{
+    text-shadow: 4px 4px 5px rgb(254, 254, 254);
+    
+}
+
+.main-wrap{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-left: 40px;
+}
+
+.item {
+font-size: 20px;
+font-weight: bold;
+color: rgb(248, 28, 12);
+text-shadow: 4px 4px 5px rgb(254, 254, 254);
+margin-bottom: 20px;
+}
+
+.all-item{
+    margin-top:0
 }

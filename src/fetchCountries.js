@@ -4,7 +4,7 @@ export function fetchCountries(name) {
         if (response.status === 200) {            
             return response.json();
           }
-      
+      // Не забывай о том, что fetch не считает 404 ошибкой, поэтому необходимо явно отклонить промис чтобы можно было словить и обработать ошибку.
           if (response.status === 404) {
             return Promise.reject('Error 404');
           }     

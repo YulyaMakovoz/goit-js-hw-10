@@ -1,5 +1,7 @@
 import './sass/index.scss';
 import { fetchCountries } from './fetchCountries';
+const debounce = require('lodash.debounce');
+import Notiflix from 'notiflix';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -7,40 +9,57 @@ const inputEl = document.querySelector('#search-box');
 const countryListEl = document.querySelector('.country-list');
 const countryInfoEl = document.querySelector('.country-info');
 
-inputEl.addEventListener('input', onInputChange);
+inputEl.addEventListener('input',debounce(onInputChange,DEBOUNCE_DELAY));
 
 
-// Запускает поиск по странам + ошибка если нет такой страны ---ДОБАВИТЬ!!!!
+// Если пользователь полностью очищает поле поиска, то HTTP-запрос не выполняется, а разметка списка стран или информации о стране пропадает.
+function clearInput() {
+    countryListEl.innerHTML = '';
+    countryInfoEl.innerHTML = '';
+}
+
+// Запускает поиск по странам + ошибка если нет такой страны -
 function onInputChange(event) {
+    clearInput()
+     if (event.target.value.trim() === '') {
+    return;
+  }
     const searchItem = fetchCountries(event.target.value.trim());
     searchItem
         .then((countries) => { onStartSearch(countries); })
         .catch (error => {
-        console.log(error);
+            if (error === 'Error 404') {
+                Notiflix.Notify.failure("Oops, there is no country with that name");
+        }
     });
 }
 function onStartSearch(countries) {
+    // Если в ответе бэкенд вернул больше чем 10 стран, в интерфейсе пояляется уведомление о том, что имя должно быть более специфичным. 
     if (countries.length > 10) {
-        alert("Too many matches found. Please enter a more specific name.");
+        Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
     } else if (countries.length <= 10 && countries.length > 1) {
-        countries.map (country => 
-        showList(country.name.common, country.flags.svg))
+        // Если бэкенд вернул от 2-х до 10-х стран, под тестовым полем отображается список найденных стран. Каждый элемент списка состоит из флага и имени страны.
+        showList(countries);
+      
     } else if (countries.length === 1) {
+        // Если результат запроса это массив с одной страной, в интерфейсе отображается разметка карточки с данными о стране: флаг, название, столица, население и языки.
         showCard(countries[0]);
      }
  }
 
-function showList(name, flag) {
-     countryListEl.insertAdjacentHTML('beforeend',`<li class="item"><img src="${flag}" alt="" width="50"> <h2>${name}</h2></li>`)
+function showList(array) {
+    const listMarking = array.map(({ flags, name }) => { return `<li class="item-list"><img src="${flags.svg}" alt="" width="50" height = "30"> <h2>${name.official}</h2></li>`; }).join('')
+
+    countryListEl.insertAdjacentHTML('beforeend', listMarking);
 }
  
 function showCard(country) {
     const { name, capital,  population,flags, languages } = country;
-    countryInfoEl.insertAdjacentHTML('beforeend', `<div class=""><img src="${flags.svg}" alt="" width="50"><h1>${name.common}</h1></div>
-      <ul class="">
-      <li>Capital:${capital}</li>
-      <li>Population:${population}</li>
-      <li>Languages:${Object.values(languages)}</li>
+    countryInfoEl.insertAdjacentHTML('beforeend', `<div class="main-wrap"><img src="${flags.svg}" alt="" width="50" height = "30"><h1>${name.official}</h1></div>
+      <ul class="all-item">
+      <li class="item">Capital: ${capital}</li>
+      <li class="item">Population: ${population} people</li>
+      <li class="item">Languages: ${Object.values(languages)}</li>
     </ul>`);
 }
 
